@@ -1,7 +1,8 @@
 import express from "express";
-import { taskModel } from "../Models/task.model.js";
 import mongoose from "mongoose";
-import { userModel } from "../Models/user.model.js";
+import {userModel} from '../Models/user.model.js'
+import {taskModel} from '../Models/task.model.js'
+
 
 const adminRoute = express.Router();
 

@@ -1,13 +1,14 @@
 import dotenv from 'dotenv'
 dotenv.config();
 import express from 'express'
-import Database_Conn from './src/Database/Database_Conn.js'
-import authRoute from './src/Routes/user.auth.route.js';
-import userRoute from './src/Routes/user.route.js';
-import adminRoute from './src/Routes/admin.route.js';
-import AuthMiddleware from './src/Middlewares/auth.middleware.js';
-import AdminMiddleware from './src/Middlewares/admin.middleware.js';
 import cors from 'cors'
+import authRoute from './Routes/user.auth.route.js';
+import userRoute from './Routes/user.route.js';
+import AuthMiddleware from './Middlewares/auth.middleware.js';
+import AdminMiddleware from './Middlewares/admin.middleware.js';
+import adminRoute from './Routes/admin.route.js';
+import Database_Conn from './Database/Database_Conn.js';
+
 
 
 const PORT = process.env.PORT || 3001
@@ -31,6 +32,6 @@ server.get('/',(req,res)=>{
 })
 
 server.listen(PORT,()=>{
-    Database_Conn()
+    Database_Conn();
     console.log(`your server is started on port ${PORT}`)
 })
