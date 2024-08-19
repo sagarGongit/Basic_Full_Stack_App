@@ -2,11 +2,12 @@ import express from "express";
 import mongoose from "mongoose";
 import {userModel} from '../Models/user.model.js'
 import {taskModel} from '../Models/task.model.js'
-
+import AuthMiddleware from "../Middlewares/auth.middleware.js";
+import AdminMiddleware from "../Middlewares/admin.middleware.js";
 
 const adminRoute = express.Router();
 
-adminRoute.post("/add-task", async (req, res) => {
+adminRoute.post("/add-task",[AuthMiddleware,AdminMiddleware],async (req, res) => {
   const userName = req.body.name;
   const { title, description, status, priority, due_date } = req.body;
   if (!title || !description || !priority || !due_date) {
@@ -42,7 +43,7 @@ adminRoute.post("/add-task", async (req, res) => {
   }
 });
 
-adminRoute.get("/get-task", async (req, res) => {
+adminRoute.get("/get-task",[AuthMiddleware,AdminMiddleware],async (req, res) => {
   var limit = parseInt(req.query.limit);
   let sort = req.query.sort == "new" ? -1 : 1 || -1;
   try {
@@ -55,7 +56,7 @@ adminRoute.get("/get-task", async (req, res) => {
   }
 });
 
-adminRoute.patch("/update-task/:id", async (req, res) => {
+adminRoute.patch("/update-task/:id",[AuthMiddleware,AdminMiddleware],async (req, res) => {
   const { title, status, assignee, due_date } = req.body;
   const taskId = req.params.id;
   const update = { title, status, assignee, due_date };
@@ -91,7 +92,7 @@ adminRoute.patch("/update-task/:id", async (req, res) => {
   }
 });
 
-adminRoute.delete("/delete-task/:id", async (req, res) => {
+adminRoute.delete("/delete-task/:id",[AuthMiddleware,AdminMiddleware],async (req, res) => {
   const taskId = req.params.id;
   if (!mongoose.Types.ObjectId.isValid(taskId)) {
     return res.status(501).json({
@@ -118,7 +119,7 @@ adminRoute.delete("/delete-task/:id", async (req, res) => {
   }
 });
 
-adminRoute.get("/get-users", async (req, res) => {
+adminRoute.get("/get-users",[AuthMiddleware,AdminMiddleware],async (req, res) => {
   const limit = parseInt(req.query.limit);
   var sort;
   if (req.query.sort == "asc") {
@@ -139,7 +140,7 @@ adminRoute.get("/get-users", async (req, res) => {
 });
 
 
-adminRoute.get("/delete-user/:id", async (req, res) => {
+adminRoute.get("/delete-user/:id",[AuthMiddleware,AdminMiddleware],async (req, res) => {
   const userId = req.params.id;
   if(!mongoose.Types.ObjectId.isValid(userId)){
     return res.status(501).json({

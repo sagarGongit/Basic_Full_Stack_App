@@ -1,10 +1,12 @@
 import express from "express";
 import { taskModel } from "../Models/task.model.js";
 import mongoose from "mongoose";
+import AuthMiddleware from "../Middlewares/auth.middleware.js";
+
 
 const userRoute = express.Router();
 
-userRoute.post("/add-task", async (req, res) => {
+userRoute.post("/add-task",AuthMiddleware,async (req, res) => {
   const { title, description, status, priority, due_date } = req.body;
   if (!title || !description || !priority || !due_date) {
     return res.status(409).json({
@@ -40,7 +42,7 @@ userRoute.post("/add-task", async (req, res) => {
   }
 });
 
-userRoute.get("/get-task", async (req, res) => {
+userRoute.get("/get-task",AuthMiddleware,async (req, res) => {
   const name = req.body.name;
   const limit = parseInt(req.query.limit) || 0;
   const sort = req.query.sort == "new" ? -1 : 1 || -1;
@@ -57,7 +59,7 @@ userRoute.get("/get-task", async (req, res) => {
   }
 });
 
-userRoute.patch("/update-task/:id", async (req, res) => {
+userRoute.patch("/update-task/:id",AuthMiddleware,async (req, res) => {
   const { title, status, assignee, due_date } = req.body;
   const taskId = req.params.id;
   const update = { title, status, assignee, due_date };
@@ -93,7 +95,7 @@ userRoute.patch("/update-task/:id", async (req, res) => {
   }
 });
 
-userRoute.delete("/delete-task/:id", async (req, res) => {
+userRoute.delete("/delete-task/:id",AuthMiddleware,async (req, res) => {
   const taskId = req.params.id;
   if (!mongoose.Types.ObjectId.isValid(taskId)) {
     return res.status(501).json({
