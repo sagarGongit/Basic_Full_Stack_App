@@ -17,11 +17,11 @@ server.use(express.json());
 
 server.use(cors({ origin: "*" }));
 
-server.use("/user", authRoute);
+server.use(authRoute);
 
-server.use("/user", userRoute);
+server.use("/user",AuthMiddleware,userRoute);
 
-server.use("/admin", adminRoute);
+server.use("/admin",[AuthMiddleware,AdminMiddleware],adminRoute);
 
 server.get("/", (req, res) => {
   res.status(200).json({

@@ -1,13 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
-import {userModel} from '../Models/user.model.js'
-import {taskModel} from '../Models/task.model.js'
-import AuthMiddleware from "../Middlewares/auth.middleware.js";
-import AdminMiddleware from "../Middlewares/admin.middleware.js";
+import { userModel } from "../Models/user.model.js";
+import { taskModel } from "../Models/task.model.js";
 
 const adminRoute = express.Router();
 
-adminRoute.post("/add-task",[AuthMiddleware,AdminMiddleware],async (req, res) => {
+adminRoute.post("/add-task", async (req, res) => {
   const userName = req.body.name;
   const { title, description, status, priority, due_date } = req.body;
   if (!title || !description || !priority || !due_date) {
@@ -43,7 +41,7 @@ adminRoute.post("/add-task",[AuthMiddleware,AdminMiddleware],async (req, res) =>
   }
 });
 
-adminRoute.get("/get-task",[AuthMiddleware,AdminMiddleware],async (req, res) => {
+adminRoute.get("/get-task", async (req, res) => {
   var limit = parseInt(req.query.limit);
   let sort = req.query.sort == "new" ? -1 : 1 || -1;
   try {
@@ -56,7 +54,19 @@ adminRoute.get("/get-task",[AuthMiddleware,AdminMiddleware],async (req, res) => 
   }
 });
 
-adminRoute.patch("/update-task/:id",[AuthMiddleware,AdminMiddleware],async (req, res) => {
+adminRoute.get("/view-task/:id", async (req, res) => {
+  const taskId = req.params.id;
+  try {
+    const task = await taskModel.find({ _id: taskId });
+    res.status(200).send(task);
+  } catch (error) {
+    res.status(501).json({
+      message: "error occured during fetching tasks",
+    });
+  }
+});
+
+adminRoute.patch("/update-task/:id", async (req, res) => {
   const { title, status, assignee, due_date } = req.body;
   const taskId = req.params.id;
   const update = { title, status, assignee, due_date };
@@ -92,7 +102,7 @@ adminRoute.patch("/update-task/:id",[AuthMiddleware,AdminMiddleware],async (req,
   }
 });
 
-adminRoute.delete("/delete-task/:id",[AuthMiddleware,AdminMiddleware],async (req, res) => {
+adminRoute.delete("/delete-task/:id", async (req, res) => {
   const taskId = req.params.id;
   if (!mongoose.Types.ObjectId.isValid(taskId)) {
     return res.status(501).json({
@@ -119,7 +129,7 @@ adminRoute.delete("/delete-task/:id",[AuthMiddleware,AdminMiddleware],async (req
   }
 });
 
-adminRoute.get("/get-users",[AuthMiddleware,AdminMiddleware],async (req, res) => {
+adminRoute.get("/get-users", async (req, res) => {
   const limit = parseInt(req.query.limit);
   var sort;
   if (req.query.sort == "asc") {
@@ -139,27 +149,43 @@ adminRoute.get("/get-users",[AuthMiddleware,AdminMiddleware],async (req, res) =>
   }
 });
 
-
-adminRoute.get("/delete-user/:id",[AuthMiddleware,AdminMiddleware],async (req, res) => {
+adminRoute.get("/view-user/:id", async (req, res) => {
   const userId = req.params.id;
-  if(!mongoose.Types.ObjectId.isValid(userId)){
+  try {
+    const user = await taskModel.find({ _id: userId });
+    if (!user.length > 0) {
+      return res.status(404).json({
+        message: "user not found please check again",
+      });
+    }
+    res.status(200).send(user);
+  } catch (error) {
+    res.status(501).json({
+      message: "error occured during fetching tasks",
+    });
+  }
+});
+
+adminRoute.delete("/delete-user/:id", async (req, res) => {
+  const userId = req.params.id;
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(501).json({
       message: "invalid id format",
     });
   }
-  const user = await userModel.findOne({_id:userId});
+  const user = await userModel.findOne({ _id: userId });
   try {
-    if(user){
-     await userModel.deleteOne({_id:userId});
-    res.status(200).json({
-       message : 'user deleted successfully',
-       name : user.name
-    });
-    }else{
+    if (user) {
+      await userModel.deleteOne({ _id: userId });
       res.status(200).json({
-        message : 'user not found',
-        name : user.name
-     });
+        message: "user deleted successfully",
+        name: user.name,
+      });
+    } else {
+      res.status(200).json({
+        message: "user not found",
+        name: user.name,
+      });
     }
   } catch (error) {
     res.status(501).json({
@@ -167,6 +193,5 @@ adminRoute.get("/delete-user/:id",[AuthMiddleware,AdminMiddleware],async (req, r
     });
   }
 });
-
 
 export default adminRoute;

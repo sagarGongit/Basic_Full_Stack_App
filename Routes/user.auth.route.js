@@ -77,7 +77,7 @@ authRoute.post("/login", async (req, res) => {
           role: user.role,
           name: user.name,
         },
-        process.env.SECRET_KEY
+        process.env.SECRET_KEY,{expiresIn : "1h"}
       );
       if (err) {
         return res.status(501).json({
@@ -88,6 +88,7 @@ authRoute.post("/login", async (req, res) => {
         return res.status(200).json({
           message: "login successfull",
           token: token,
+          role : user.role
         });
       } else {
         res.status(401).json({
