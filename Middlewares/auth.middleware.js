@@ -9,7 +9,7 @@ const AuthMiddleware = async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   if (!token) {
     return res.status(401).json({
-      error: "token not found"
+      error: "your token get expired may be please login again"
     });
   }
   try {

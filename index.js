@@ -25,7 +25,7 @@ server.use("/admin",[AuthMiddleware,AdminMiddleware],adminRoute);
 
 server.get("/", (req, res) => {
   res.status(200).json({
-    message: "your server testing is complete",
+    message: "your server testing is completed",
   });
 });
 
